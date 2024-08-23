@@ -30,15 +30,15 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v2
 
-    - name: Install kubectl
-      run: |
-        curl -LO "https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl"
-        chmod +x ./kubectl
-        sudo mv ./kubectl /usr/local/bin/kubectl
+    - name: Set up kubectl
+      uses: azure/setup-kubectl@v1
+      with:
+        version: 'v1.20.0'
 
-    - name: Set up Kubeconfig
+    - name: Create kubeconfig directory
       run: |
-        echo "${{ secrets.KUBECONFIG_CONTENT }}" > $HOME/.kube/config
+        mkdir -p ~/.kube
+        echo "${{ secrets.KUBECONFIG_CONTENT }}" > ~/.kube/config
 
     - name: Deploy to Kubernetes
       run: |
