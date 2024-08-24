@@ -42,7 +42,7 @@ jobs:
         apiVersion: v1
         clusters:
         - cluster:
-            certificate-authority-data: ${{ secrets.CA_CERT }}
+            certificate-authority-data: '${{ secrets.CA_CERT }}'
             server: https://<minikube-cluster-endpoint>
           name: minikube
         contexts:
@@ -56,8 +56,8 @@ jobs:
         users:
         - name: minikube-user
           user:
-            client-certificate-data: ${{ secrets.CLIENT_CERT }}
-            client-key-data: ${{ secrets.CLIENT_KEY }}" > ~/.kube/config
+            client-certificate-data: '${{ secrets.CLIENT_CERT }}'
+            client-key-data: '${{ secrets.CLIENT_KEY }}'" > ~/.kube/config
 
     - name: Deploy to Kubernetes
       run: |
