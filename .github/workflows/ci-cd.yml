@@ -45,7 +45,7 @@ jobs:
         - name: minikube
           cluster:
             certificate-authority-data: '${{ secrets.CA_CERT }}'
-            server: https://<minikube-cluster-endpoint>
+            server: 'https://<minikube-cluster-endpoint>'
         contexts:
         - name: minikube
           context:
