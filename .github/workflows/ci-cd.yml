@@ -38,26 +38,26 @@ jobs:
     - name: Create kubeconfig directory and config
       run: |
         mkdir -p ~/.kube
-        echo "
+        cat <<EOF > ~/.kube/config
         apiVersion: v1
+        kind: Config
         clusters:
-        - cluster:
+        - name: minikube
+          cluster:
             certificate-authority-data: '${{ secrets.CA_CERT }}'
             server: https://<minikube-cluster-endpoint>
-          name: minikube
         contexts:
-        - context:
+        - name: minikube
+          context:
             cluster: minikube
             user: minikube-user
-          name: minikube
         current-context: minikube
-        kind: Config
-        preferences: {}
         users:
         - name: minikube-user
           user:
             client-certificate-data: '${{ secrets.CLIENT_CERT }}'
-            client-key-data: '${{ secrets.CLIENT_KEY }}'" > ~/.kube/config
+            client-key-data: '${{ secrets.CLIENT_KEY }}'
+        EOF
 
     - name: Deploy to Kubernetes
       run: |
