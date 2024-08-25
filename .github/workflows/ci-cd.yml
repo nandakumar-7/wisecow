@@ -27,38 +27,25 @@ jobs:
     runs-on: ubuntu-latest
     needs: build
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
-
+    - name: Set up Azure CLI
+      uses: azure/setup-azure-cli@v1
+      with:
+        azure-cli-version: '2.41.0'
+      
+    - name: Log in to Azure
+      uses: azure/login@v1
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+      
     - name: Set up kubectl
       uses: azure/setup-kubectl@v1
       with:
-        version: 'v1.20.0'
-
-    - name: Create kubeconfig directory and config
+        version: 'v1.29.7' # Ensure this matches your AKS version
+    
+    - name: Get AKS credentials
       run: |
-        mkdir -p ~/.kube
-        cat <<EOF > ~/.kube/config
-        apiVersion: v1
-        kind: Config
-        clusters:
-        - name: minikube
-          cluster:
-            certificate-authority-data: '${{ secrets.CA_CERT }}'
-            server: 'https://<minikube-cluster-endpoint>'
-        contexts:
-        - name: minikube
-          context:
-            cluster: minikube
-            user: minikube-user
-        current-context: minikube
-        users:
-        - name: minikube-user
-          user:
-            client-certificate-data: '${{ secrets.CLIENT_CERT }}'
-            client-key-data: '${{ secrets.CLIENT_KEY }}'
-        EOF
-
+        az aks get-credentials --resource-group wisecow --name wisecow
+    
     - name: Deploy to Kubernetes
       run: |
         kubectl apply -f k8s/deployment.yaml
