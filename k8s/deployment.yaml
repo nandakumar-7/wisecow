@@ -15,7 +15,8 @@ spec:
         app: wisecow
     spec:
       containers:
-      - name: wisecow-container
+      - name: wisecow
         image: nanda07/wisecow:latest
         ports:
         - containerPort: 4499
+        # You can add more environment variables or volume mounts here if needed
