@@ -16,7 +16,6 @@ spec:
     spec:
       containers:
       - name: wisecow
-        image: nanda07/wisecow:latest
+        image: wiseco.azurecr.io/wisecow:latest
         ports:
         - containerPort: 4499
-        # You can add more environment variables or volume mounts here if needed

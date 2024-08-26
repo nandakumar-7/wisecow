@@ -1,0 +1,52 @@
+name: Deploy to ACR and AKS
+
+on:
+  push:
+    branches: [ main ]
+
+env:
+  ACR_NAME: wiseco
+  AKS_CLUSTER_NAME: wiseco
+  RESOURCE_GROUP: wiseco
+  REGION: westus2
+
+jobs:
+  build:
+    name: Build and Deploy
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Check out code
+      uses: actions/checkout@v2
+
+    - name: Set short git commit SHA
+      id: commit
+      run: echo "::set-output name=short_sha::$(git rev-parse --short HEAD)"
+
+    - name: Log in to Azure CLI
+      uses: azure/login@v1
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+    - name: Azure Container Registry login
+      run: az acr login --name ${{ env.ACR_NAME }}
+
+    - name: Build, tag, and push image to ACR
+      env:
+        IMAGE_TAG: ${{ steps.commit.outputs.short_sha }}
+      run: |
+        docker build -t ${{ env.ACR_NAME }}.azurecr.io/wisecow:${{ env.IMAGE_TAG }} .
+        docker push ${{ env.ACR_NAME }}.azurecr.io/wisecow:${{ env.IMAGE_TAG }}
+
+    - name: Get AKS Credentials
+      run: |
+        az aks get-credentials --resource-group ${{ env.RESOURCE_GROUP }} --name ${{ env.AKS_CLUSTER_NAME }}
+
+    - name: Deploy to AKS
+      env:
+        IMAGE_TAG: ${{ steps.commit.outputs.short_sha }}
+      run: |
+        sed -i.bak "s|wiseco.azurecr.io/wisecow:.*|wiseco.azurecr.io/wisecow:${{ env.IMAGE_TAG }}|g" deployment.yaml
+        kubectl apply -f deployment.yaml
+        kubectl apply -f service.yaml
+        kubectl apply -f ingress.yaml
