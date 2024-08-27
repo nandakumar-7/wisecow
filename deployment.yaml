@@ -14,8 +14,11 @@ spec:
       labels:
         app: wisecow
     spec:
-      containers:
-      - name: wisecow
-        image: wiseco.azurecr.io/wisecow:latest
+  containers:
+  - name: wisecow
+    image: wiseco.azurecr.io/wisecow:latest
+    imagePullPolicy: Always
+  imagePullSecrets:
+  - name: acr-secret
         ports:
         - containerPort: 4499
